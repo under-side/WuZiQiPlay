@@ -14,6 +14,8 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Paint.Style;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -75,6 +77,19 @@ public class WuziqiView extends View {
 		mWhitePiecesBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.stone_w);
 		mBlacePiecesBitmap=BitmapFactory.decodeResource(getResources(), R.drawable.stone_b);
 	}
+	
+	private onWuziqiChangedListener listener;
+	
+	public void setOnWuziqiChangedListener(onWuziqiChangedListener listener)
+	{
+		this.listener=listener;
+	}
+	
+	public interface onWuziqiChangedListener{
+		public void isWhoWinner();
+		public void onPiecesChanged(boolean isWhitePieces);
+	}
+	
 	
 	/*
 	 * 重写onMeasure方法去测量自定义的view的宽高。
@@ -183,6 +198,10 @@ public class WuziqiView extends View {
 			}
 			//对该值取反，是黑白棋轮流下棋
 			isWhitePieces=!isWhitePieces;
+			if(listener!=null)
+		    {
+		    	listener.onPiecesChanged(isWhitePieces);
+		    }
 		}
 		return true;
 	}
@@ -204,5 +223,51 @@ public class WuziqiView extends View {
 		
 		mWhitePiecesBitmap=Bitmap.createScaledBitmap(mWhitePiecesBitmap, bitmapHeight, bitmapHeight, false);
 		mBlacePiecesBitmap=Bitmap.createScaledBitmap(mBlacePiecesBitmap, bitmapHeight, bitmapHeight, false);
+	}
+	
+	/*
+	 * 对该view中的数据进行保存，防止view重建时，关键数据丢失。
+	 * 该写法为标准的view保存与恢复的写法，不同的是根据项目的需求保存不同的数据。
+	 * 另外重要的一点是：如果自定义view中想要保存与恢复view时，需要给该view一个id，
+	 * 用此id唯一的标识该view，使activity来调用该view去重建。
+	 */
+	
+	//定义保存数据的键值对
+	private static final String INSTANCE="instance";
+	private static final String INSTANCE_IS_GAME_OVER="isGameOver";
+	private static final String INSTANCE_WHITE_PIECES_ARRAY="WhitePiecesArray";
+	private static final String INSTANCE_BLACK_PIECES_ARRAY="BlackPiecesArray";
+	
+	@Override
+	protected Parcelable onSaveInstanceState() {
+		//将该view中需要保存的数据保存到bundle中
+		Bundle bundle=new Bundle();
+		
+		bundle.putParcelable(INSTANCE, super.onSaveInstanceState());
+		bundle.putBoolean(INSTANCE_IS_GAME_OVER, isGameOver);
+		bundle.putParcelableArrayList(INSTANCE_WHITE_PIECES_ARRAY, mWhitePiecesArray);
+		bundle.putParcelableArrayList(INSTANCE_BLACK_PIECES_ARRAY, mBlackPiecesArray);
+		return bundle;
+	}
+	
+	/*
+	 * 根据保存的数据，activity在回复view时，调用该方法，根据方法中的数据对view进行重建
+	 * @see android.view.View#onRestoreInstanceState(android.os.Parcelable)
+	 */
+	@Override
+	protected void onRestoreInstanceState(Parcelable state) {
+		//先判断，获取的state是否为自定义保存的对象，是的话，就获取保存的数据，进行view的重建赋值
+		if(state instanceof Bundle)
+		{
+			Bundle bundle=(Bundle) state;
+			//从bundle中获取保存的数据，赋值初始化给该view的全局变量
+			isGameOver=bundle.getBoolean(INSTANCE_IS_GAME_OVER);
+			mWhitePiecesArray=bundle.getParcelableArrayList(INSTANCE_WHITE_PIECES_ARRAY);
+			mBlackPiecesArray=bundle.getParcelableArrayList(INSTANCE_BLACK_PIECES_ARRAY);
+		
+			//获取系统默认保存的内容，并调用父类的onRestoreInstanceState方法去实现系统默认的操作
+			super.onRestoreInstanceState(bundle.getParcelable(INSTANCE));
+		}
+		super.onRestoreInstanceState(state);
 	}
 }
