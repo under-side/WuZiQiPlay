@@ -33,4 +33,4 @@
    
    
    
-![五子棋绘制示意图](https://github.com/under-side/WuZiQiPlay/blob/master/photo/wuzipi.png)
+![](https://github.com/under-side/WuZiQiPlay/blob/master/photo/wuzipi.png "五子棋绘制示意图")
