@@ -152,6 +152,11 @@ public class WuziqiView extends View {
 		// »æÖÆºÚÆå
 		DrawViewUtils.onDrawBlackPieces(canvas, mBlackPiecesArray, myPaint,
 				mBlacePiecesBitmap, mCellHeight);
+		
+		if(listener!=null)
+		{
+			listener.isWhoTurns(isWhitePiecesTurns);
+		}
 	}
 
 	/*
@@ -212,7 +217,7 @@ public class WuziqiView extends View {
 				isGameOver = CheckGameUtils.checkGameIsOver(mBlackPiecesArray);
 				if (isGameOver) {
 					if (listener != null) {
-						listener.isWhoWinner(!isWhitePiecesTurns);
+						listener.isWhoWinner(isWhitePiecesTurns);
 					}
 				}
 			}

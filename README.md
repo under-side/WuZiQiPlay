@@ -30,7 +30,3 @@
    1. 缩小棋子图片的尺寸，利用Bitmap.createScaledBitmap()方法去将原有的bitmap按照一定的尺寸进行缩放；
    2. 根据设置的单元格将棋盘转换为从x-->0-n,y-->n的形式去替换其所在的坐标，利用positionX=x/cellHeight;positionY=y/cellHeight;
    2. canvas绘制bitmap时，是从左上开始绘制。则，画静态草图，计算每个单元格上左上的坐标变化规律；
-   
-   
-   
-![](https://github.com/under-side/WuZiQiPlay/blob/master/photo/wuzipi.png "五子棋绘制示意图")
